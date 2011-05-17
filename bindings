@@ -42,7 +42,7 @@
 # %% -> % character
 # %p -> name of the current file (without path, but pwd is its path)
 # %f -> name of the current file. Unlike %p, if file is located on a
-#	non-local virtual filesystem, i.e. either tarfs, mcfs or ftpfs,
+#	non-local virtual filesystem, i.e. either tarfs or ftpfs,
 #	then the file will be temporarily copied into a local directory
 #	and %f will be the full path to this local temporal file.
 #	If you don't want to get a local copy and want to get the
@@ -391,7 +391,7 @@ shell/.ico
 	Include=image
 
 include/image
-	Open=if [ "$DISPLAY" = "" ]; then zgv %f; else (gqview %f &); fi
+	Open=if [ "$DISPLAY" = "" ]; then zgv %f; else (eog %f 2>/dev/null &); fi
 	View=%view{ascii} identify %f
 	#View=%view{ascii} asciiview %f
 
@@ -399,32 +399,32 @@ include/image
 ### Sound files ###
 
 regex/\.([wW][aA][vV]|[sS][nN][dD]|[vV][oO][cC]|[aA][uU]|[sS][mM][pP]|[aA][iI][fF][fF]|[sS][nN][dD])$
-       Open=if [ "$DISPLAY" = "" ]; then play %f; else (xmms %f >/dev/null 2>&1 &); fi
+       Open=mplayer -volume 38 %d/%p
 
 regex/\.([mM][oO][dD]|[sS]3[mM]|[xX][mM]|[iI][tT]|[mM][tT][mM]|669|[sS][tT][mM]|[uU][lL][tT]|[fF][aA][rR])$
        Open=mikmod %f
        #Open=tracker %f
 
 regex/\.([wW][aA][wW]22)$
-       Open=vplay -s 22 %f
+       Open=mplayer -volume 38 %d/%p
 
 regex/\.([mM][pP]3)$
-	Open=if [ "$DISPLAY" = "" ]; then mpg123 %f; else (xmms %f >/dev/null 2>&1 &); fi
+	Open=mplayer -volume 38 %d/%p
 	View=%view{ascii} mpg123 -vtn1 %f 2>&1 | sed -n '/^Title/,/^Comment/p;/^MPEG/,/^Audio/p'
 
 regex/\.([oO][gG][gG|aA|vV|xX])$
-	Open=if [ "$DISPLAY" = "" ]; then ogg123 %f; else (xmms %f >/dev/null 2>&1 &); fi
+	Open=mplayer -volume 38 %d/%p
 	View=%view{ascii} ogginfo %s
 
 regex/\.([sS][pP][xX]|[fF][lL][aA][cC])$
-	Open=if [ "$DISPLAY" = "" ]; then play %f; else (xmms %f >/dev/null 2>&1 &); fi
+	Open=mplayer -volume 38 %d/%p
 
 regex/\.([mM][iI][dD][iI]?|[rR][mM][iI][dD]?)$
 	Open=timidity %f
 
 regex/\.([wW][mM][aA])$
-	Open=mplayer -vo null %f
-	View=%view{ascii} mplayer -quiet -slave -frames 0 -vo null -ao null -identify %f 2>/dev/null | tail +13 || file %f
+	Open=mplayer -volume 38 %d/%p
+	View=%view{ascii} mplayer -volume 38 -quiet -slave -frames 0 -vo null -ao null -identify %d/%p 2>/dev/null | tail +13 || file %f
 
 
 ### Play lists ###
@@ -469,7 +469,7 @@ regex/\.([rR][aA]?[mM])$
 	Open=(realplay %f >/dev/null 2>&1 &)
 
 include/video
-	Open=(mplayer %f >/dev/null 2>&1 &)
+	Open=(mplayer -volume 38 %d/%p)
 	#Open=(gtv %f >/dev/null 2>&1 &)
 	#Open=(xanim %f >/dev/null 2>&1 &)
 
@@ -483,7 +483,7 @@ type/^PostScript
 
 # PDF
 type/^PDF
-	Open=(xpdf %f &)
+	Open=(evince %f &)
 	#Open=(acroread %f &)
 	#Open=(ghostview %f &)
 	View=%view{ascii} pdftotext %f -
@@ -493,7 +493,7 @@ type/^PDF
 
 # html
 regex/\.([hH][tT][mM][lL]?)$
-	Open=(if test -n "gnome-moz-remote" && test -n "$DISPLAY"; then (gnome-moz-remote file://%d/%p &) 1>&2; else links %f || lynx -force_html %f || ${PAGER:-more} %f; fi) 2>/dev/null
+	Open=(if test -n "firefox" && test -n "$DISPLAY"; then (firefox file://%d/%p &) 1>&2; else links %f || lynx -force_html %f || ${PAGER:-more} %f; fi) 2>/dev/null
 	View=%view{ascii} links -dump %f 2>/dev/null || w3m -dump %f 2>/dev/null || lynx -dump -force_html %f
 
 # StarOffice 5.2
@@ -511,22 +511,22 @@ shell/.abw
 
 # Microsoft Word Document
 regex/\.([Dd][oO][cCtT]|[Ww][rR][iI])$
-	Open=(abiword %f >/dev/null 2>&1 &)
+	Open=(oowriter %f >/dev/null 2>&1 &)
 	View=%view{ascii} antiword -t %f || catdoc -w %f || word2x -f text %f - || strings %f
 type/^Microsoft\ Word
-	Open=(abiword %f >/dev/null 2>&1 &)
+	Open=(oowriter %f >/dev/null 2>&1 &)
 	View=%view{ascii} antiword -t %f || catdoc -w %f || word2x -f text %f - || strings %f
 
 # RTF document
 regex/\.([rR][tT][fF])$
-	Open=(abiword %f >/dev/null 2>&1 &)
+	Open=(oowriter %f >/dev/null 2>&1 &)
 
 # Microsoft Excel Worksheet
 regex/\.([xX][lL][sSwW])$
-	Open=(gnumeric %f >/dev/null 2>&1 &)
+	Open=(oocalc %f >/dev/null 2>&1 &)
 	View=%view{ascii} xls2csv %f || strings %f
 type/^Microsoft\ Excel
-	Open=(gnumeric %f >/dev/null 2>&1 &)
+	Open=(oocalc %f >/dev/null 2>&1 &)
 	View=%view{ascii} xls2csv %f || strings %f
 
 # Use OpenOffice.org to open any MS Office documents
@@ -548,7 +548,7 @@ regex/\.([Tt][Ee][Xx])$
 
 # DjVu
 regex/\.(djvu|DJVU)$
-	Open=djview %f &
+	Open=evince %f &
 
 ### Miscellaneous ###
 
