@@ -1,6 +1,5 @@
-
 [Midnight-Commander]
-show_backups=1
+show_backups=2
 kilobyte_si=0
 show_dot_files=1
 verbose=1
